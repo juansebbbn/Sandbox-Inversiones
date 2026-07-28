@@ -1,0 +1,190 @@
+/*
+ * Tema colorido tipo dashboard (referencia: Bullmarket) para el simulador.
+ * Paleta oscura de fondo con acentos vivos para destacar valores clave.
+ */
+
+.root {
+    -fx-font-family: "Helvetica Neue", Arial, sans-serif;
+    -fx-font-size: 13px;
+    -fx-background-color: #10161f;
+}
+
+.pantalla-inicio,
+.pantalla-dashboard {
+    -fx-background-color: #10161f;
+}
+
+.tarjeta {
+    -fx-background-color: #1a2333;
+    -fx-background-radius: 10;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.35), 12, 0, 0, 4);
+}
+
+.titulo-tarjeta {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #f4f6fb;
+}
+
+.titulo-app {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #37d67a;
+}
+
+.encabezado {
+    -fx-background-color: #161f2e;
+    -fx-border-color: transparent transparent #232f45 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.barra-tiempo {
+    -fx-background-color: #131b28;
+}
+
+.label {
+    -fx-text-fill: #b7c2d6;
+}
+
+.valor-destacado {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #f4f6fb;
+}
+
+.insignia-estado {
+    -fx-background-color: #23324a;
+    -fx-background-radius: 12;
+    -fx-padding: 4 12 4 12;
+    -fx-text-fill: #58a6ff;
+    -fx-font-weight: bold;
+}
+
+.texto-error {
+    -fx-text-fill: #ff6b6b;
+    -fx-font-weight: bold;
+}
+
+.texto-placeholder {
+    -fx-text-fill: #6b7891;
+    -fx-font-style: italic;
+}
+
+.positivo {
+    -fx-text-fill: #37d67a;
+    -fx-font-weight: bold;
+}
+
+.negativo {
+    -fx-text-fill: #ff6b6b;
+    -fx-font-weight: bold;
+}
+
+.button {
+    -fx-background-color: #23324a;
+    -fx-text-fill: #f4f6fb;
+    -fx-background-radius: 6;
+    -fx-padding: 6 14 6 14;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #2d4266;
+}
+
+.boton-primario {
+    -fx-background-color: #37d67a;
+    -fx-text-fill: #0b1710;
+    -fx-font-weight: bold;
+}
+
+.boton-primario:hover {
+    -fx-background-color: #4de892;
+}
+
+.boton-comprar {
+    -fx-background-color: #37d67a;
+    -fx-text-fill: #0b1710;
+}
+
+.boton-comprar:hover {
+    -fx-background-color: #4de892;
+}
+
+.boton-vender {
+    -fx-background-color: #ff6b6b;
+    -fx-text-fill: #200909;
+}
+
+.boton-vender:hover {
+    -fx-background-color: #ff8787;
+}
+
+.table-view {
+    -fx-background-color: #1a2333;
+    -fx-control-inner-background: #1a2333;
+    -fx-table-cell-border-color: #232f45;
+    -fx-text-fill: #f4f6fb;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: #161f2e;
+}
+
+.table-view .column-header, .table-view .filler {
+    -fx-background-color: transparent;
+}
+
+.table-view .column-header .label {
+    -fx-text-fill: #b7c2d6;
+    -fx-font-weight: bold;
+}
+
+.table-row-cell {
+    -fx-background-color: #1a2333;
+    -fx-text-fill: #f4f6fb;
+}
+
+.table-row-cell:odd {
+    -fx-background-color: #1e2a3f;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #23324a;
+}
+
+.table-cell {
+    -fx-text-fill: #f4f6fb;
+}
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: #161f2e;
+}
+
+.tab {
+    -fx-background-color: #1a2333;
+}
+
+.tab:selected {
+    -fx-background-color: #23324a;
+}
+
+.tab .tab-label {
+    -fx-text-fill: #b7c2d6;
+}
+
+.tab:selected .tab-label {
+    -fx-text-fill: #f4f6fb;
+    -fx-font-weight: bold;
+}
+
+.text-field, .date-picker, .combo-box, .spinner {
+    -fx-background-color: #23324a;
+    -fx-text-fill: #f4f6fb;
+    -fx-background-radius: 6;
+}
+
+.text-field {
+    -fx-prompt-text-fill: #6b7891;
+}

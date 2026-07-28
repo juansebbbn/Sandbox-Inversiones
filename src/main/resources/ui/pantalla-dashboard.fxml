@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Spinner?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<BorderPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.simuladorinversiones.ui.ControladorPantallaDashboard"
+            styleClass="pantalla-dashboard">
+
+    <top>
+        <VBox>
+            <HBox styleClass="encabezado" spacing="24" alignment="CENTER_LEFT">
+                <padding>
+                    <Insets top="16" right="24" bottom="16" left="24"/>
+                </padding>
+                <Label text="Simulador de Inversiones" styleClass="titulo-app"/>
+                <VBox alignment="CENTER_LEFT">
+                    <Label text="Fecha simulada"/>
+                    <Label fx:id="etiquetaFecha" styleClass="valor-destacado"/>
+                </VBox>
+                <VBox alignment="CENTER_LEFT">
+                    <Label text="Saldo efectivo"/>
+                    <Label fx:id="etiquetaSaldo" styleClass="valor-destacado"/>
+                </VBox>
+                <VBox alignment="CENTER_LEFT">
+                    <Label text="Patrimonio neto"/>
+                    <Label fx:id="etiquetaPatrimonio" styleClass="valor-destacado"/>
+                </VBox>
+                <Label fx:id="etiquetaEstado" styleClass="insignia-estado"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="botonPausar" text="Pausar sesión" onAction="#alPausarSesion"/>
+                <Button fx:id="botonFinalizar" text="Finalizar sesión" onAction="#alFinalizarSesion"/>
+                <Button text="Volver al inicio" onAction="#alVolverInicio"/>
+            </HBox>
+
+            <HBox styleClass="barra-tiempo" spacing="12" alignment="CENTER_LEFT">
+                <padding>
+                    <Insets top="10" right="24" bottom="10" left="24"/>
+                </padding>
+                <Label text="Mover tiempo:"/>
+                <ComboBox fx:id="comboUnidadTiempo"/>
+                <Spinner fx:id="spinnerCantidadTiempo" editable="true" prefWidth="80"/>
+                <Button text="◀ Retroceder" onAction="#alRetroceder"/>
+                <Button text="Avanzar ▶" styleClass="boton-primario" onAction="#alAvanzar"/>
+                <Separator orientation="VERTICAL"/>
+                <Label text="Avance automático:"/>
+                <Slider fx:id="sliderVelocidad" min="0.2" max="3.0" value="1.0" prefWidth="140"/>
+                <Label fx:id="etiquetaVelocidad"/>
+                <Button fx:id="botonPlayPausaContinuo" text="Iniciar avance automático"
+                        onAction="#alPresionarPlayPausaContinuo"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <center>
+        <TabPane tabClosingPolicy="UNAVAILABLE">
+            <Tab text="Activos disponibles">
+                <TableView fx:id="tablaActivos">
+                    <columns>
+                        <TableColumn fx:id="columnaNombreActivo" text="Nombre" prefWidth="220"/>
+                        <TableColumn fx:id="columnaTickerActivo" text="Ticker" prefWidth="100"/>
+                        <TableColumn fx:id="columnaTipoActivo" text="Tipo" prefWidth="120"/>
+                        <TableColumn fx:id="columnaPrecioActivo" text="Precio actual" prefWidth="120"/>
+                        <TableColumn fx:id="columnaAccionesActivo" text="Operar" prefWidth="200"/>
+                    </columns>
+                </TableView>
+            </Tab>
+            <Tab text="Mi cartera">
+                <TableView fx:id="tablaCartera">
+                    <columns>
+                        <TableColumn fx:id="columnaNombrePosicion" text="Activo" prefWidth="220"/>
+                        <TableColumn fx:id="columnaCantidadPosicion" text="Cantidad" prefWidth="100"/>
+                        <TableColumn fx:id="columnaPrecioPromedioPosicion" text="Precio promedio" prefWidth="130"/>
+                        <TableColumn fx:id="columnaPrecioActualPosicion" text="Precio actual" prefWidth="120"/>
+                        <TableColumn fx:id="columnaValorPosicion" text="Valor actual" prefWidth="120"/>
+                        <TableColumn fx:id="columnaGananciaPosicion" text="Ganancia/Pérdida" prefWidth="140"/>
+                    </columns>
+                </TableView>
+            </Tab>
+            <Tab text="Noticias">
+                <VBox alignment="CENTER" spacing="8">
+                    <Label text="Todavía no hay noticias cargadas para esta época." styleClass="texto-placeholder"/>
+                    <Label text="Se van a poder ver acá una vez que se incorpore la ingesta de noticias históricas."
+                           styleClass="texto-placeholder"/>
+                </VBox>
+            </Tab>
+        </TabPane>
+    </center>
+</BorderPane>
