@@ -2,7 +2,7 @@ package com.simuladorinversiones.core.repositorios;
 
 import com.simuladorinversiones.config.ConfiguracionBaseDatos;
 import com.simuladorinversiones.core.entidades.Activo;
-import com.simuladorinversiones.core.entidades.TipoActivo;
+import com.simuladorinversiones.core.enums.TipoActivo;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;

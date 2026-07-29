@@ -1,5 +1,6 @@
 package com.simuladorinversiones.core.servicios;
 
+import com.simuladorinversiones.core.datos.ImportadorDatosHistoricos;
 import com.simuladorinversiones.core.entidades.Usuario;
 import com.simuladorinversiones.core.repositorios.RepositorioActivo;
 import com.simuladorinversiones.core.repositorios.RepositorioCarteraUsuario;
@@ -52,6 +53,10 @@ public class FabricaServicios {
 
     public ServicioCartera servicioCartera() {
         return new ServicioCartera(repositorioSesion, repositorioCartera, repositorioPosicion, repositorioHistorialPrecio);
+    }
+
+    public ImportadorDatosHistoricos servicioImportacion() {
+        return new ImportadorDatosHistoricos(repositorioActivo, repositorioHistorialPrecio);
     }
 
     /** La app es de un solo usuario sin autenticación: se reutiliza el único Usuario, o se crea al primer arranque. */

@@ -21,6 +21,8 @@
         <junit.version>5.10.2</junit.version>
         <mockito.version>5.12.0</mockito.version>
         <testfx.version>4.0.18</testfx.version>
+        <json.version>20240303</json.version>
+        <poi.version>5.2.5</poi.version>
 
         <!-- Clase principal usada por el plugin javafx-maven-plugin -->
         <app.mainClass>com.simuladorinversiones.ui.AplicacionPrincipal</app.mainClass>
@@ -61,6 +63,18 @@
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-database-postgresql</artifactId>
             <version>${flyway.version}</version>
+        </dependency>
+
+        <!-- Ingesta de datos históricos (core.datos): parseo de JSON (Yahoo Finance) y de planillas .xls (Shiller) -->
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>${json.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>${poi.version}</version>
         </dependency>
 
         <!-- Testing -->
@@ -121,6 +135,13 @@
                 <configuration>
                     <mainClass>${app.mainClass}</mainClass>
                 </configuration>
+            </plugin>
+
+            <!-- Permite correr el importador de datos históricos con: mvn compile exec:java -Dexec.mainClass=... -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.2.0</version>
             </plugin>
 
             <!-- Permite aplicar el esquema con: mvn flyway:migrate -->

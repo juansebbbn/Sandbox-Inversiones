@@ -29,4 +29,12 @@ public class RepositorioHistorialPrecio extends RepositorioBase<HistorialPrecio,
                 .getResultList();
         return resultado.isEmpty() ? Optional.empty() : Optional.of(resultado.get(0));
     }
+
+    /** Usado por la ingesta de datos históricos para saltear puntos que ya están cargados para ese activo. */
+    public List<LocalDate> buscarFechasExistentes(Long activoId) {
+        return entityManager.createQuery(
+                        "SELECT h.fecha FROM HistorialPrecio h WHERE h.activo.id = :activoId", LocalDate.class)
+                .setParameter("activoId", activoId)
+                .getResultList();
+    }
 }
