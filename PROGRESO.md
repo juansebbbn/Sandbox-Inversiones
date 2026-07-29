@@ -86,3 +86,45 @@ Pendiente para próximos módulos:
 - Ingesta real de datos históricos en `core.datos` (Dow Jones/S&P 500/Shiller, oro vía measuringworth.com, acciones individuales vía Stooq) — hoy el dashboard depende de los datos semilla de `V2__datos_semilla_prueba.sql`.
 - Ingesta de noticias históricas (NYT Archive API) — bloqueada, todavía no hay API key. La pestaña "Noticias" del dashboard existe en el FXML pero no tiene datos para mostrar.
 - Empaquetado con `jpackage` para distribución nativa.
+
+## 2026-07-29 — Ingesta de datos históricos: acciones (Yahoo Finance) y S&P 500 (Shiller)
+
+Qué se hizo:
+- Se implementó `core.datos`, hasta ahora vacío (solo tenía un `.gitkeep`): dos fuentes de datos históricos y un importador que los vuelca a la base.
+- `FuenteDatosYahooFinance` descarga la serie diaria completa de una acción desde la API pública de gráficos de Yahoo Finance (`query1.finance.yahoo.com/v8/finance/chart/{ticker}`, JSON, sin API key). Parsea la respuesta con `org.json` (dependencia nueva, liviana, sin transitivas).
+- `FuenteDatosShiller` descarga y parsea `ie_data.xls` (dataset público de Robert Shiller, `.xls` viejo formato BIFF) con Apache POI (`HSSFWorkbook`), extrayendo el precio nominal mensual del S&P Composite desde 1871. Dependencia nueva: `org.apache.poi:poi` (sin `poi-ooxml`, no hace falta para `.xls`).
+- `ImportadorDatosHistoricos` (recibe `RepositorioActivo` y `RepositorioHistorialPrecio` por constructor, mismo patrón mockeable que el resto de `core.servicios`) hace upsert por ticker: crea el `Activo` si no existe, extiende `fechaDisponibleDesde` hacia atrás si los datos nuevos van más lejos en el pasado, e inserta solo los `HistorialPrecio` de fechas que todavía no estaban cargadas (evita el conflicto con la unique constraint `activo_id+fecha` en reimportaciones).
+- Se agregó `ImportadorPrincipal`, un `main()` de línea de comandos (no pasa por la UI): reutiliza `EjecutorTransaccional.ejecutar(...)` para abrir la única transacción de la corrida, igual que cualquier acción de la UI. Se corre con `mvn compile exec:java -Dexec.mainClass=... -Dexec.args="yahoo AAPL 'Apple Inc.' ACCION"` o `-Dexec.args="shiller"`. Se agregó `exec-maven-plugin` al `pom.xml` para esto.
+- Se agregaron `RepositorioActivo.buscarPorTicker` y `RepositorioHistorialPrecio.buscarFechasExistentes`, usados por el importador.
+- `FabricaServicios` ahora expone `servicioImportacion()`.
+- Tests nuevos (11 total): `FuenteDatosYahooFinanceTest` y `FuenteDatosShillerTest` contra fixtures en memoria (JSON armado a mano / `HSSFWorkbook` armado a mano), sin red; `ImportadorDatosHistoricosTest` con los repos mockeados (creación de activo nuevo, salteo de fechas duplicadas, extensión de `fechaDisponibleDesde`).
+
+Por qué:
+- El plan original (de la spec del producto) era usar Stooq para acciones individuales. Al intentarlo, Stooq resultó estar bloqueando **todo** acceso no-navegador (tanto `/q/d/l/` como su descarga bulk en `static.stooq.com`) detrás de un desafío anti-bot: un proof-of-work en JavaScript que hay que resolver y mandar a `/__verify` antes de que el sitio sirva contenido real. Programar ese solver habría sido evadir deliberadamente una protección anti-scraping puesta a propósito — se decidió con el usuario cambiar a Yahoo Finance en su lugar, que expone una API JSON pública sin ningún gate de este tipo.
+- measuringworth.com (oro) tampoco tiene descarga directa — es un formulario interactivo. Se decidió no scrapearlo por ahora (queda pendiente, ver abajo) para no bloquear el resto del módulo por una sola fuente.
+
+Bug encontrado y corregido en el camino:
+- Pedirle a Yahoo Finance `range=max&interval=1d` no da precios diarios reales para historiales largos: Yahoo lo recorta en silencio a granularidad trimestral (`meta.dataGranularity` vuelve `"3mo"` en vez de `"1d"`) sin avisar ni devolver error — para AAPL, en vez de ~11500 precios diarios devolvía 168 (uno cada 3 meses). Se detectó comparando el conteo de precios contra lo esperado en una prueba manual contra la API real, no en los tests unitarios con fixtures (esos no lo hubieran detectado porque el fixture no reproduce el recorte de Yahoo). Se resolvió pidiendo un rango explícito (`period1=0&period2=<epoch actual>`) en vez de `range=max`, que sí devuelve la serie diaria completa.
+
+Verificación:
+- `mvn test` (JAVA_HOME=openjdk@21): 28/28 tests OK (los 2 tests que pegan contra PostgreSQL real — `RepositorioActivoTest` y `ServiciosIntegracionTest` — no corrieron en esta sesión porque el Colima local está en un estado roto ajeno a este cambio: "vz driver is running but host agent is not"; no se tocó esa configuración).
+- Se corrió una prueba manual contra las fuentes reales (fuera de la suite de tests, con un `main()` descartable) confirmando: Yahoo Finance trae 11498 precios diarios de AAPL desde 1980-12-12 hasta hoy; Shiller trae 1833 precios mensuales del S&P 500 desde 1871-01 hasta 2023-09 (el dataset de Shiller no se actualiza en tiempo real, se corta ahí).
+
+Pendiente para próximos módulos:
+- Oro (measuringworth.com) y Dow Jones: no cubiertos todavía. El dataset de Shiller solo trae el S&P Composite; Dow Jones necesitaría otra fuente. measuringworth.com necesitaría scraping de HTML (es un formulario, no tiene export CSV directo) o un flujo de importación manual vía CSV si se prefiere no scrapear.
+- Reparar el entorno local de Colima/Docker (no es un problema del proyecto, es de esta máquina) para poder correr `RepositorioActivoTest` y `ServiciosIntegracionTest`, y probar la ingesta end-to-end contra PostgreSQL real.
+- Ingesta de noticias históricas (NYT Archive API) — bloqueada, todavía no hay API key.
+- Empaquetado con `jpackage` para distribución nativa.
+
+## 2026-07-29 — Reorganización: excepciones y enums en paquetes propios
+
+Qué se hizo:
+- Se movieron las dos excepciones del proyecto (`ExcepcionOperacionInvalida`, antes en `core.servicios`; `ExcepcionIngestaDatos`, antes en `core.datos`) a un paquete nuevo, `core.excepciones`.
+- Se movieron los cuatro enums (`TipoActivo`, `EstadoSesion`, `TipoTransaccion`, antes en `core.entidades`; `UnidadTiempo`, antes en `core.servicios`) a un paquete nuevo, `core.enums`.
+- Se actualizaron los imports en los ~20 archivos que los usaban (entidades, servicios, controllers de UI, fuentes de datos y sus tests).
+
+Por qué:
+- Pedido explícito del usuario: tener las excepciones agrupadas en una sola carpeta y los enums en otra, en vez de repartidos junto a la clase que los usa primero.
+
+Verificación:
+- `mvn test` (JAVA_HOME=openjdk@21): mismos 26/28 verdes que antes del refactor (los 2 que fallan siguen siendo los que requieren PostgreSQL real, no relacionados con este cambio).

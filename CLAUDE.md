@@ -36,6 +36,12 @@ mvn test -Dtest=ServicioTransaccionesTest#nombreDelMetodo
 
 # Compile only
 mvn compile
+
+# Import historical data (core/datos) — a standalone CLI, not a UI action
+mvn compile exec:java -Dexec.mainClass="com.simuladorinversiones.core.datos.ImportadorPrincipal" \
+    -Dexec.args="yahoo AAPL 'Apple Inc.' ACCION"
+mvn compile exec:java -Dexec.mainClass="com.simuladorinversiones.core.datos.ImportadorPrincipal" \
+    -Dexec.args="shiller"
 ```
 
 ### Java version
@@ -73,6 +79,12 @@ core/servicios/                — business logic (Servicio*), receives repos vi
 core/repositorios/             — one repo per entity, extends RepositorioBase<T, ID> (generic CRUD)
    ↓ uses
 core/entidades/                — JPA entities (plain Hibernate, no Spring Data)
+
+core/enums/                    — every enum used by entities/services (TipoActivo, EstadoSesion,
+                                  TipoTransaccion, UnidadTiempo), in one place rather than colocated with
+                                  whichever entity/service happens to use them
+core/excepciones/               — every unchecked exception (ExcepcionOperacionInvalida,
+                                   ExcepcionIngestaDatos), same reasoning
 ```
 
 Every UI action that touches the database goes through `EjecutorTransaccional.ejecutar(fabrica -> ...)`.
@@ -89,10 +101,11 @@ it (controllers have no zero-arg init hook of their own — the caller wires the
 ### Domain model
 
 Core entities (`core/entidades`): `Usuario` → `SesionInversion` (a simulation run, `EstadoSesion`:
-presumably ACTIVA/PAUSADA/FINALIZADA) → `CarteraUsuario` (1:1 with a session) → `PosicionCartera`
+ACTIVA/PAUSADA/FINALIZADA) → `CarteraUsuario` (1:1 with a session) → `PosicionCartera`
 (cartera–activo holdings with quantity + weighted average buy price) and `Transaccion` (buy/sell log).
 Market data: `Activo` (`TipoActivo`) with a `HistorialPrecio` time series. `Noticia` for historical news
-(ingestion not yet implemented).
+(ingestion not yet implemented). The enums (`EstadoSesion`, `TipoActivo`, `TipoTransaccion`, `UnidadTiempo`)
+live in `core/enums`, not alongside the entity/service that uses them.
 
 Business rules of note (in `core/servicios`):
 - Sessions are bounded to dates between `FECHA_MINIMA` (1900-01-01) and `FECHA_LIMITE` (2026-01-01),
@@ -131,10 +144,33 @@ design decision like the interest rate or the no-short-selling rule was made). C
 starting new work, and add an entry when you complete a module, following its existing format (Qué se hizo
 / Por qué / Pendiente).
 
+## Historical data ingestion (`core/datos`)
+
+Standalone, not part of the UI flow — run via `ImportadorPrincipal` (see Commands above), which wraps the
+whole import in one `EjecutorTransaccional.ejecutar(...)` call. Two sources implemented so far:
+
+- `FuenteDatosYahooFinance`: individual stocks, daily granularity, via Yahoo Finance's public chart JSON
+  API (`query1.finance.yahoo.com/v8/finance/chart/{ticker}`, no API key). Originally planned to use Stooq,
+  but Stooq now gates every endpoint (including bulk CSV) behind a JavaScript proof-of-work anti-bot
+  challenge — bypassing that would mean deliberately evading anti-bot protection, so Yahoo Finance was used
+  instead. **Must** request an explicit `period1=0&period2=<now>` range rather than `range=max`: confirmed
+  empirically that `range=max&interval=1d` gets silently downsampled by Yahoo to quarterly granularity
+  (`meta.dataGranularity` comes back `"3mo"`) for long histories, while an explicit period range returns the
+  true daily series.
+- `FuenteDatosShiller`: the S&P 500 (ticker `SP500-SHILLER`), monthly, from Robert Shiller's public dataset
+  (`econ.yale.edu/~shiller/data/ie_data.xls`, an old-format `.xls` parsed with Apache POI's `HSSFWorkbook`).
+  Dates are encoded as `year.month` floats (e.g. `1871.01` = Jan 1871, `2021.1` = Oct 2021 — the trailing
+  zero of "10" is lost as a float), so the header row and stop condition are detected dynamically rather
+  than hardcoded, since the sheet grows every time Shiller updates the file.
+- `ImportadorDatosHistoricos` upserts by ticker: finds-or-creates the `Activo`, extends
+  `fechaDisponibleDesde` backwards if the new data goes further back, and only inserts `HistorialPrecio`
+  rows for dates not already present (skip-on-duplicate, not update-on-duplicate).
+
 ## Known pending work (from PROGRESO.md)
 
-- Historical data ingestion (`core/datos` — currently just a `.gitkeep`): Dow Jones/S&P 500/Shiller, gold
-  via measuringworth.com, individual stocks via Stooq.
+- Historical data ingestion: Dow Jones and gold (measuringworth.com) still not implemented — Shiller's
+  dataset only covers the S&P Composite, and measuringworth.com is a query form with no direct CSV export,
+  so it needs either HTML scraping or a manual-CSV-import path if pursued.
 - Historical news ingestion (NYT Archive API) — blocked on an API key.
 - Real dashboard UI (portfolio evolution charts, ControlsFX/Ikonli styling).
 - `jpackage` native packaging for distribution.

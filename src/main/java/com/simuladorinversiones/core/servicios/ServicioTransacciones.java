@@ -2,12 +2,13 @@ package com.simuladorinversiones.core.servicios;
 
 import com.simuladorinversiones.core.entidades.Activo;
 import com.simuladorinversiones.core.entidades.CarteraUsuario;
-import com.simuladorinversiones.core.entidades.EstadoSesion;
 import com.simuladorinversiones.core.entidades.HistorialPrecio;
 import com.simuladorinversiones.core.entidades.PosicionCartera;
 import com.simuladorinversiones.core.entidades.SesionInversion;
 import com.simuladorinversiones.core.entidades.Transaccion;
-import com.simuladorinversiones.core.entidades.TipoTransaccion;
+import com.simuladorinversiones.core.enums.EstadoSesion;
+import com.simuladorinversiones.core.enums.TipoTransaccion;
+import com.simuladorinversiones.core.excepciones.ExcepcionOperacionInvalida;
 import com.simuladorinversiones.core.repositorios.RepositorioActivo;
 import com.simuladorinversiones.core.repositorios.RepositorioCarteraUsuario;
 import com.simuladorinversiones.core.repositorios.RepositorioHistorialPrecio;

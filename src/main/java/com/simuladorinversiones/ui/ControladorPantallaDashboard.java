@@ -2,13 +2,13 @@ package com.simuladorinversiones.ui;
 
 import com.simuladorinversiones.config.EjecutorTransaccional;
 import com.simuladorinversiones.core.entidades.Activo;
-import com.simuladorinversiones.core.entidades.EstadoSesion;
 import com.simuladorinversiones.core.entidades.HistorialPrecio;
 import com.simuladorinversiones.core.entidades.SesionInversion;
-import com.simuladorinversiones.core.servicios.ExcepcionOperacionInvalida;
+import com.simuladorinversiones.core.enums.EstadoSesion;
+import com.simuladorinversiones.core.enums.UnidadTiempo;
+import com.simuladorinversiones.core.excepciones.ExcepcionOperacionInvalida;
 import com.simuladorinversiones.core.servicios.FabricaServicios;
 import com.simuladorinversiones.core.servicios.PosicionPortafolio;
-import com.simuladorinversiones.core.servicios.UnidadTiempo;
 import javafx.animation.Animation;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;

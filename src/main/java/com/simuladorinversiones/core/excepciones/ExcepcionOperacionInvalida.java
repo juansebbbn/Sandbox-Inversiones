@@ -1,4 +1,4 @@
-package com.simuladorinversiones.core.servicios;
+package com.simuladorinversiones.core.excepciones;
 
 /** Se lanza cuando una operación de negocio viola una regla de la simulación (ej. vender más de lo que se posee). */
 public class ExcepcionOperacionInvalida extends RuntimeException {

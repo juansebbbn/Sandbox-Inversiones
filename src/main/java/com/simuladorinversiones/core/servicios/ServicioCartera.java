@@ -5,6 +5,7 @@ import com.simuladorinversiones.core.entidades.CarteraUsuario;
 import com.simuladorinversiones.core.entidades.HistorialPrecio;
 import com.simuladorinversiones.core.entidades.PosicionCartera;
 import com.simuladorinversiones.core.entidades.SesionInversion;
+import com.simuladorinversiones.core.excepciones.ExcepcionOperacionInvalida;
 import com.simuladorinversiones.core.repositorios.RepositorioCarteraUsuario;
 import com.simuladorinversiones.core.repositorios.RepositorioHistorialPrecio;
 import com.simuladorinversiones.core.repositorios.RepositorioPosicionCartera;

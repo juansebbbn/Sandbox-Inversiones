@@ -1,9 +1,9 @@
 package com.simuladorinversiones.ui;
 
 import com.simuladorinversiones.config.EjecutorTransaccional;
-import com.simuladorinversiones.core.entidades.EstadoSesion;
 import com.simuladorinversiones.core.entidades.SesionInversion;
-import com.simuladorinversiones.core.servicios.ExcepcionOperacionInvalida;
+import com.simuladorinversiones.core.enums.EstadoSesion;
+import com.simuladorinversiones.core.excepciones.ExcepcionOperacionInvalida;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

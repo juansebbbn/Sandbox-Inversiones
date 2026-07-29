@@ -1,8 +1,9 @@
 package com.simuladorinversiones.core.servicios;
 
-import com.simuladorinversiones.core.entidades.EstadoSesion;
 import com.simuladorinversiones.core.entidades.SesionInversion;
 import com.simuladorinversiones.core.entidades.Usuario;
+import com.simuladorinversiones.core.enums.EstadoSesion;
+import com.simuladorinversiones.core.excepciones.ExcepcionOperacionInvalida;
 import com.simuladorinversiones.core.repositorios.RepositorioCarteraUsuario;
 import com.simuladorinversiones.core.repositorios.RepositorioSesionInversion;
 import com.simuladorinversiones.core.repositorios.RepositorioUsuario;

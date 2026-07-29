@@ -1,5 +1,6 @@
 package com.simuladorinversiones.core.entidades;
 
+import com.simuladorinversiones.core.enums.EstadoSesion;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
