@@ -61,3 +61,28 @@ Pendiente para próximos módulos:
 - Ingesta de noticias históricas (NYT Archive API).
 - UI real tipo dashboard: pantallas para crear/retomar sesión, comprar/vender, avanzar/retroceder tiempo (incluyendo el avance continuo con velocidad configurable, que todavía no se implementó — es más un detalle de UI/temporizador que de lógica de negocio).
 - Empaquetado con `jpackage` para distribución nativa.
+
+## 2026-07-28 — UI real: navegación de pantallas, dashboard de cartera
+
+Qué se hizo:
+- Se reemplazó la app mínima placeholder (`pantalla-principal.fxml` / `ControladorPantallaPrincipal`) por un flujo de dos pantallas: `pantalla-inicio.fxml` (crear sesión nueva o retomar/reanudar una guardada) → `pantalla-dashboard.fxml` (operar la sesión activa).
+- `NavegadorPantallas` centraliza la carga de FXML sobre el `Stage` único de la app y devuelve el controller cargado para que quien navega lo inicialice explícitamente (los controllers no tienen hook de inicialización propio, dependen de que el llamador les pase el contexto).
+- `EjecutorTransaccional` es ahora el único lugar que abre un `EntityManager` + transacción: recibe una función que trabaja sobre una `FabricaServicios` fresca y hace commit o rollback según si la función lanza una `RuntimeException`. Todo `@FXML` handler que toca la base pasa por acá.
+- `FabricaServicios` arma todos los repositorios/servicios sobre un mismo `EntityManager` y agrega `obtenerOCrearUsuarioUnico()`, que reutiliza la única fila `Usuario` o la crea en el primer arranque — consistente con el modelo de un solo usuario sin autenticación.
+- Se agregó la capa `ServicioCartera` + `PosicionPortafolio` (record de solo lectura) para calcular, por sesión: las posiciones con su valor de mercado actual y ganancia/pérdida (usando el último precio conocido de cada activo a la fecha simulada), y el patrimonio neto total (efectivo + valor de las posiciones).
+- `ControladorPantallaDashboard` implementa la pantalla operativa completa: fecha/saldo/patrimonio/estado de la sesión, tabla de activos disponibles con botones comprar/vender (piden cantidad por diálogo), tabla de la cartera, controles de avance/retroceso de tiempo por unidad (día/semana/mes/año) y cantidad, y avance automático continuo (un `Timeline` de JavaFX que llama a `ServicioAvanceTiempo.avanzar` un día a la vez a un intervalo configurable por slider, y se detiene solo si la sesión termina o se pausa/finaliza manualmente).
+- Se agregó `V2__datos_semilla_prueba.sql`: datos de prueba (activos + historial de precios) para poder ejercitar el dashboard localmente sin depender todavía de la ingesta real de datos históricos.
+- Se agregó `estilos.css` con el look oscuro de las dos pantallas.
+
+Por qué:
+- Antes de meterse con la ingesta de datos reales (el próximo módulo pendiente), tenía más sentido cerrar el círculo completo de la UI para poder probar visualmente el flujo entero (crear sesión → comprar/vender → avanzar tiempo → ver ganancia/pérdida → finalizar) con datos de prueba controlados.
+- Se centralizó la apertura de `EntityManager`/transacción en `EjecutorTransaccional` en vez de dejar que cada controller abra la suya, para que la regla "una transacción por acción de UI" sea imposible de romper por accidente y quede en un solo lugar auditable.
+
+Verificación:
+- `mvn test` (JAVA_HOME=openjdk@21): 20/20 tests OK, sin regresiones.
+- Se corrió `mvn javafx:run` contra la base local y se confirmó visualmente que la pantalla dashboard renderiza bien con datos reales de la sesión y de `V2__datos_semilla_prueba.sql`.
+
+Pendiente para próximos módulos:
+- Ingesta real de datos históricos en `core.datos` (Dow Jones/S&P 500/Shiller, oro vía measuringworth.com, acciones individuales vía Stooq) — hoy el dashboard depende de los datos semilla de `V2__datos_semilla_prueba.sql`.
+- Ingesta de noticias históricas (NYT Archive API) — bloqueada, todavía no hay API key. La pestaña "Noticias" del dashboard existe en el FXML pero no tiene datos para mostrar.
+- Empaquetado con `jpackage` para distribución nativa.
