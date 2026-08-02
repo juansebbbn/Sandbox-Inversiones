@@ -1,6 +1,6 @@
 # Simulador de Inversiones
 
-> ⚠️ **Proyecto en construcción.** Todavía está en desarrollo activo, hay funcionalidades pendientes y la interfaz aún no está terminada. No usar en producción.
+> ⚠️ **Proyecto en construcción.** Todavía está en desarrollo activo, hay funcionalidades pendientes y la interfaz aún no está terminada.
 
 Aplicación de escritorio (JavaFX, un solo usuario, sin login) que permite simular inversiones sobre datos
 históricos de mercado: crear una "sesión" a partir de una fecha histórica, comprar y vender activos a sus
